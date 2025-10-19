@@ -3,7 +3,8 @@
 import express from 'express' ;
 import cors from 'cors' ; 
 import multer from 'multer';
-import { GoogleGenAI } from '@google/genai';
+// --- PERUBAHAN 1: Menggunakan library dan class yang benar ---
+import { GoogleGenerativeAI } from '@google/generative-ai';
 // Session 5 - import path/url package 
 import path from"node:path";
 import { fileURLToPath } from "node:url";
@@ -30,7 +31,9 @@ import { on } from 'node:events';
 const app = express();
 const upload = multer(); // akan digunakan di dalam recording 
 
-const ai = new GoogleGenAI({ }); // instantation objek menjadi intance (oop)
+// --- PERUBAHAN 2: Inisialisasi AI dengan API Key dari .env ---
+// Pastikan kamu punya file .env dengan isi: API_KEY=kunci_api_kamu
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
 
 // Session 5 - enambhaan Path
 const __filename = fileURLToPath(import.meta.url);
@@ -64,21 +67,19 @@ app.post('/generate-text', async (req, res,) => {
     }
     //
     try {
-        const aiResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: [
-                { text: prompt }
-            ],
-            //config Ai untuk lebih jauh
-            config: {
-                systemInstruction: 'Harus dibalas dalam bahasa indonesia.'
-            }
+        // --- PERUBAHAN 3: Cara baru memanggil model dan mendapatkan respons ---
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash", // Menggunakan nama model terbaru
+            systemInstruction: "Balas dengan bahasa indonesia yang baik dan benar, perkenalkan dirikamu sebagai AURA (sebagai teman curhat), tidak terlalu panjang tetapi layaknya seorang teman dekat yang siap mendengarkan curhatan.",
         });
+
+        const result = await model.generateContent(prompt);
+        const response = result.response;
 
         res.status(200).json({
             success: true,
             message: 'Berhasil dijawab sama Gemini nih!',
-            data: aiResponse.text
+            data: response.text() // Mendapatkan teks dari respons
         });
     } catch (e) {
         console.log(e);
@@ -92,94 +93,42 @@ app.post('/generate-text', async (req, res,) => {
 
 // fitur chat
 // endpoint: POST/API
-app.post("/appi/chat", async (req, res) => {
+app.post("/api/chat", async (req, res) => {
     const { conversation } = req.body;
 
     try {
-        // satpam #1: Cek conversation apakah berupa array atau tidak 
-        //            dengan Array.isArray().
-        if(!Array.isArray(conversation)) {
-            throw new Error("Converstaion harus berupa array!");
+        // --- VALIDASI SEMENTARA SAYA SEDERHANAKAN ---
+        if(!Array.isArray(conversation) || conversation.length === 0) {
+            throw new Error("Conversation harus berupa array dan tidak boleh kosong!");
         }
+        // --- KODE LAMA YANG BIKIN ERROR SUDAH DIHAPUS ---
 
-        // Satpam kedua: Cek setiap pesan dalam coversatio, apakah vaid atau tidak
-        let messageIsValid = true;
-
-        if(conversation.length === 0) {
-            throw new Error("Conversation tidak boleh kosong!");
-        }
-
-        for (let i = 0; i < message.length; i++) {
-            const message = conversation[i]
-        }
-
-        conversation.forEach(message => {
-            // Kondisi #1 -- message harus berupa object dan bukan null
-
-            // bisa tambah 1 kondisi lagi untuk cek variable messageIsValid
-            // disini
-
-            if (!message || typeof message !== 'object') {
-               messageIsValid = false;
-               return; 
-            }
-
-            const keys = Object.keys(message);
-            const objectHasValidKeys = keys.every(key => ['text', 'role'].includes(key));
-
-            // looping kondisi di dalam array
-            // 
-            //
-
-            // Kondisi kedua -- message harus punya stuktur yang valid
-            if (keys,length !==2 || objectHasValidKeys) {
-                messageIsValid = false;
-                return;
-            }
-
-
-            const { text, role } = message;
-
-            // Kondisi 3A -- role harus valid 
-            if (!['model', 'user'].includes(role )) {
-                messageIsValid = false;
-                return; 
-            }
-            
-            // Kondisi 3B -- teks harus valid
-            if (!text || typeof text !== 'string') {
-                messageIsValid = false;
-                return;
-            }
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            systemInstruction: "Balas dengan Bahasa indonesia yang baik dan benar, perkenalkan dirikamu sebagai AURA (sebagai teman curhat),, tidak terlalu panjang tetapi seperti layaknya seorang teman dekat yang siap mndengarkan curhatan.",
         });
 
-        if (!messageIsValid) {
-            throw new Error("Message Harus Valid!");
-        }
-
-        // Prosess dagingnya
-        const contents = conversation.map(({ role, text }) => ({
-            role, 
-            parts: [{ text }] 
+        // Memisahkan riwayat chat dengan pesan terakhir dari user
+        const history = conversation.slice(0, -1).map(({ role, text }) => ({
+            role,
+            parts: [{ text }],
         }));
+        
+        const lastMessage = conversation[conversation.length - 1];
 
-        const aiResponse = await ai.models.generateContent({
-            model: 'gemini-flash',
-            contents,
-            config: {
-                systemInstruction: "Harus Membalas dengan Bahasa sunda."
-            }
-        })
+        const chat = model.startChat({ history });
+        const result = await chat.sendMessage(lastMessage.text);
+        const response = result.response;
 
         res.status(200).json({
             success: true,
             message: "Berhasil dibalas oleh google Gemini!",
-            data: aiResponse.text
+            data: response.text() // Mendapatkan teks dari respons
         });
     } catch (e) {
         res.status(500).json({
             success: false,
-            message: e.message,
+            message: e.message, // Mengambil pesan error yang lebih spesifik
             data: null,
         })
     }
@@ -189,3 +138,5 @@ app.post("/appi/chat", async (req, res) => {
 app.listen(3000, () => {
     console.log('I Love You 3000');
 });
+
+

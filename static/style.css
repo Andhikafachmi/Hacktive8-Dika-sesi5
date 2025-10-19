@@ -1,77 +1,132 @@
+/* style.css (Versi Final yang Diperbaiki & Diperkuat) */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
-  margin: 0;
-  padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    gap: 20px;
+    position: relative; /* Diperlukan agar footer bisa menempel di bawah */
 }
 
-.container {
-  max-width: 600px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* --- GAYA JUDUL BARU (SEJAJAR) --- */
+.title-container {
+    text-align: center;
+}
+.title-container h1 {
+    font-size: 30px; /* Ukuran untuk "AURA" */
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+.title-container .h1-small {
+    font-size: 25px; /* Ukuran lebih kecil untuk "Curhat bareng" */
+    font-weight: 400;
+    color: #a0a0a0; /* Warna sedikit redup */
+    vertical-align: middle; /* Kunci agar teksnya sejajar di tengah */
+}
+/* ------------------------ */
+
+
+.chat-container {
+    width: 100%;
+    max-width: 600px;
+    height: 50vh; 
+    border: 1px solid #c6cbd3;
+    border-radius: 25px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px #000000dc;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
+#chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.chat-box {
-  height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #fafafa;
-  margin-bottom: 10px;
-}
-
+/* Style dasar untuk SEMUA gelembung pesan */
 .message {
-  margin: 8px 0;
-  padding: 8px 12px;
-  border-radius: 20px;
-  max-width: 80%;
-  display: inline-block;
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 70%;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
-.message.user {
-  background-color: #d1e7ff;
-  float: right;
-  text-align: right;
+/* Style KHUSUS untuk gelembung pesan PENGGUNA (.user) */
+.user {
+    background-color: #ffc400dc;
+    color: white;
+    align-self: flex-end; /* Ini yang membuatnya di KANAN */
+    border-bottom-right-radius: 4px;
 }
 
-.message.bot {
-  background-color: #dff6dd;
-  float: left;
-  text-align: left;
+/* Style KHUSUS untuk gelembung pesan BOT (.bot) */
+.bot {
+    background-color: #f3f4f6; /* Sedikit menggelapkan background */
+    color: #1f2937; /* Menggelapkan warna teks */
+    align-self: flex-start; /* Ini yang membuatnya di KIRI */
+    border-bottom-left-radius: 4px;
+    border: 1px solid #e5e7eb;
 }
 
-form {
-  display: flex;
-  gap: 10px;
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    font-weight: bold;
 }
 
-input[type="text"] {
-  flex: 1;
-  padding: 10px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+#chat-form {
+    display: flex;
+    padding: 30px;
+    border-top: 1px solid #d1d1d1;
 }
 
-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #0d6efd;
-  color: white;
-  border-radius: 20px;
-  font-size: 16px;
-  cursor: pointer;
+#user-input {
+    flex-grow: 1;
+    border: 1px solid #ffc400;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-size: 13px;
+    margin-right: 10px;
 }
 
-button:hover {
-  background-color: #0b5ed7;
+#chat-form button {
+    background-color: #1e1e1e;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 1px 18px #00000086;
 }
+
+#chat-form button:hover {
+    background-color: #ffc400;
+}
+
+/* Style untuk footer di bawah halaman */
+.page-footer {
+    position: absolute; 
+    bottom: 15px;      
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.page-footer p {
+    font-size: 12px;   
+    color: #666;       
+    font-weight: 400;  
+}
+
